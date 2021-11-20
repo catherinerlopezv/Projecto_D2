@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Projecto.Models.MensajesViewModel>
+
+@{
+    Layout = "_Layout";
+}
+
+<p>
+    <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
+</p>
+
+@foreach (var item in Model) {
+        <ul>
+            <li>
+                Emisor:  <b>@Html.DisplayFor(modelItem => item.Emisor)</b>
+            </li>
+            <li>
+                Receptor: @Html.DisplayFor(modelItem => item.Receptor)
+            </li>
+            <li>
+                Mensaje: @Html.DisplayFor(modelItem => item.Cuerpo)
+            </li>
+            <li>
+                Hora: @Html.DisplayFor(modelItem => item.Date)
+            </li>
+        </ul>
+}
