@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mensajería Relevante, S.A.</title>
+    <link rel="stylesheet" href="~/lib/bootstrap5/css/bootstrap.min.css" />
+    <link type="text/css" href="~/lib/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link type="text/css" href="~/lib/vendor/notyf/notyf.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/volt.css" />
+</head>
+<body>
+    <header class="header-global">
+        <nav id="navbar-main" aria-label="Primary navigation" class="navbar navbar-main navbar-expand-lg navbar-theme-primary pt-4 navbar-dark">
+            <div class="container position-relative">
+                <div class="navbar-collapse collapse me-auto" id="navbar_global">
+                    <div class="navbar-collapse-header">
+                        <div class="row">
+                            <div class="col-6 collapse-brand">
+                                <a href="./index.html">
+                                    @ViewData["Title"]
+                                </a>
+                            </div>
+                            <div class="col-6 collapse-close">
+                                <a href="#navbar_global" class="fas fa-times" data-toggle="collapse" data-target="#navbar_global" aria-controls="navbar_global" aria-expanded="false" title="close" aria-label="Toggle navigation"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
+                        <li class="nav-item me-2">
+                            <a href="@Url.Action("Index", "Menu")" class="nav-link"> Inicio </a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a href="@Url.Action("MisContact", "Menu")" class="nav-link"> Contactos </a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a href="@Url.Action("Edit", "Menu")" class="nav-link"> Mi Perfil </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("BuscarMensaje", "Menu")" class="nav-link"> Buscar Mensajes </a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a href="@Url.Action("Index", "Login")" class="nav-link"> Cambiar de Usuario </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        @RenderBody()
+    </main>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/vendor/popperjs/core/dist/umd/popper.min.js"></script>
+    <script src="~/lib/vendor/bootstrap5/js/bootstrap.min.js"></script>
+    <script src="~/lib/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+    <script src="~/lib/vendor/nouislider/dist/nouislider.min.js"></script>
+    <script src="~/lib/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+    <script src="~/lib/vendor/vanillajs-datepicker/dist/js/datepicker.min.js"></script>
+    <script src="~/lib/vendor/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+    <script src="~/lib/vendor/notyf/notyf.min.js"></script>
+    <script src="~/lib/vendor/simplebar/dist/simplebar.min.js"></script>
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
