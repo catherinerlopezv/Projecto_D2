@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Projecto.Helper;
 using Projecto.Models;
 using Projecto.Utilities;
@@ -22,17 +23,18 @@ namespace Projecto.Controllers
         public ActionResult Index()
         {
             //Limpiar variables globales
-            GlobalData.Receptor = null;
-            GlobalData.ActualUser = null;
-            GlobalData.para = null;
-            GlobalData.ArchivoEntrada = null;
-            GlobalData.ArchivoSalida = null;
+            GlobalData globaldata = new GlobalData();
+            string jsondata = JsonConvert.SerializeObject(globaldata);
+            HttpContext.Session.SetString("globaldata", jsondata);
+            
             return View();
         }
       
         [HttpPost]
         public async Task<IActionResult> Ingresar(string username, string password)
         {
+            GlobalData globaldata = new GlobalData();
+            
             if (password == null)
             {
                 password = " ";
@@ -48,7 +50,9 @@ namespace Projecto.Controllers
                 password = cesar.Cifrar(password, "1234567890'¿qwertyuiop");
                 if (user.Password == password)
                 {
-                    GlobalData.ActualUser = user;
+                    globaldata.ActualUser = user;
+                    string jsondata = JsonConvert.SerializeObject(globaldata);
+                    HttpContext.Session.SetString("globaldata", jsondata);
                     return RedirectToAction("Index", "Menu");
                 }
                 else

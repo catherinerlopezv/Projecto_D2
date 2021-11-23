@@ -29,7 +29,11 @@ namespace Projecto.Controllers
         {
             lista.Clear();
             HttpClient client = _api.Initial();
-            var res = await client.GetAsync($"api/Contactos/{GlobalData.ActualUser.NickName}");
+
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            var res = await client.GetAsync($"api/Contactos/{globaldata.ActualUser.NickName}");
             if (res.IsSuccessStatusCode)
             {
                 var resultas = res.Content.ReadAsStringAsync().Result;
@@ -38,6 +42,24 @@ namespace Projecto.Controllers
             }
             return RedirectToAction("MisContactos", "Menu", lista);
         }
+
+        public async Task<JsonResult> MisContactJson() {
+            lista.Clear();
+            HttpClient client = _api.Initial();
+
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            var res = await client.GetAsync($"api/Contactos/{globaldata.ActualUser.NickName}");
+            if (res.IsSuccessStatusCode) {
+                var resultas = res.Content.ReadAsStringAsync().Result;
+                var contactosUser = JsonConvert.DeserializeObject<ContactosI>(resultas); //Obtener de los datos del usuario ingresado
+                lista.Add(contactosUser);
+            }
+            // var result = JsonConvert.SerializeObject(lista);
+            return new JsonResult(lista);
+        }
+
         [HttpGet]
         public ActionResult MisContactos(List<ContactosI> collection)
         {
@@ -70,12 +92,16 @@ namespace Projecto.Controllers
             if (contact != "" && contact != null)
             {
                 HttpResponseMessage res = await client.GetAsync($"api/Login/{contact}");
+
+                string jsondata = HttpContext.Session.GetString("globaldata");
+                GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
                 UserData user = new UserData();
                 if (res.IsSuccessStatusCode)
                 {
                     var results = res.Content.ReadAsStringAsync().Result;
                     user = JsonConvert.DeserializeObject<UserData>(results); //Obtener de los datos del usuario ingresado
-                    res = await client.GetAsync($"api/Contactos/{GlobalData.ActualUser.NickName}");
+                    res = await client.GetAsync($"api/Contactos/{globaldata.ActualUser.NickName}");
                     if (res.IsSuccessStatusCode)
                     {
                         var resultas = res.Content.ReadAsStringAsync().Result;
@@ -83,7 +109,7 @@ namespace Projecto.Controllers
                         if (!(contactosUser.ContactosAmigos.Contains(user.NickName)))
                         {
                             contactosUser.ContactosAmigos.Add(user.NickName);
-                            var postTask = client.PutAsJsonAsync<ContactosI>($"api/Contactos/{GlobalData.ActualUser.NickName}", contactosUser);
+                            var postTask = client.PutAsJsonAsync<ContactosI>($"api/Contactos/{globaldata.ActualUser.NickName}", contactosUser);
                             postTask.Wait();
                             if (postTask.Result.IsSuccessStatusCode)
                             {
@@ -95,7 +121,7 @@ namespace Projecto.Controllers
                     else
                     {
                         ContactosI nuevoContacto = new ContactosI();
-                        nuevoContacto.OwnerNickName = GlobalData.ActualUser.NickName;
+                        nuevoContacto.OwnerNickName = globaldata.ActualUser.NickName;
                         nuevoContacto.ContactosAmigos = new List<string>();
                         nuevoContacto.ContactosAmigos.Add(user.NickName);
 
@@ -118,7 +144,12 @@ namespace Projecto.Controllers
         public async Task<IActionResult> Edit()
         {
             HttpClient client = _api.Initial();
-            HttpResponseMessage res = await client.GetAsync($"api/Login/{GlobalData.ActualUser.NickName}");
+
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+
+            HttpResponseMessage res = await client.GetAsync($"api/Login/{globaldata.ActualUser.NickName}");
             UserData user = new UserData();
             if (res.IsSuccessStatusCode)
             {
@@ -126,6 +157,7 @@ namespace Projecto.Controllers
                 user = JsonConvert.DeserializeObject<UserData>(results); 
                 return View(user);
             }
+            ViewData["nickname"] = globaldata.ActualUser.NickName;
             return View();
         }
 
@@ -135,7 +167,10 @@ namespace Projecto.Controllers
             HttpClient client = _api.Initial();
             HttpResponseMessage res = await client.DeleteAsync($"api/SignIn/{id}");
 
-            return Redirect("http://localhost:10999/Login" + GlobalData.para);
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            return Redirect("http://localhost:10999/Login" + globaldata.para);
         }
 
         [HttpPost]
@@ -143,12 +178,19 @@ namespace Projecto.Controllers
         {
             try
             {
+                string jsondata = HttpContext.Session.GetString("globaldata");
+                GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
                 if (userData.Name != null && userData.Name != "" && userData.Password != null && userData.Password != "")
                 {
-                    GlobalData.ActualUser.Name = userData.Name;
-                    GlobalData.ActualUser.Password = userData.Password;
+                    globaldata.ActualUser.Name = userData.Name;
+                    globaldata.ActualUser.Password = userData.Password;
+
+                    jsondata = JsonConvert.SerializeObject(globaldata);
+                    HttpContext.Session.SetString("globaldata", jsondata);
+
                     HttpClient client = _api.Initial();
-                    var res = client.PutAsJsonAsync($"api/SignIn/", GlobalData.ActualUser);
+                    var res = client.PutAsJsonAsync($"api/SignIn/", globaldata.ActualUser);
                     res.Wait();
                     if (res.Result.IsSuccessStatusCode)
                     {

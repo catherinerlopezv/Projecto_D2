@@ -20,34 +20,41 @@ namespace Projecto.Controllers
         GenerarClavesSeguras dh = new GenerarClavesSeguras(); //Diffie-helfman
         public async Task<IActionResult> Index(string id)
         {
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+            
+
             if (id != null || id != "")
             {
-                GlobalData.para = id;
+                globaldata.para = id;
             }
-            if (GlobalData.Receptor == null || GlobalData.Receptor.NickName != id)
+            if (globaldata.Receptor == null) // || globaldata.Receptor != id)
             {
                 HttpClient client1 = _api.Initial();
-                HttpResponseMessage respuesta = await client1.GetAsync($"api/Login/{GlobalData.para}");
+                HttpResponseMessage respuesta = await client1.GetAsync($"api/Login/{globaldata.para}");
                 if (respuesta.IsSuccessStatusCode)
                 {
                     var results = respuesta.Content.ReadAsStringAsync().Result;
 
-                    GlobalData.Receptor = JsonConvert.DeserializeObject<UserData>(results); 
+                    globaldata.Receptor = JsonConvert.DeserializeObject<UserData>(results); 
                 }
             }
 
-            List<MensajesViewModel> mensajes = new List<MensajesViewModel>();
+            jsondata = JsonConvert.SerializeObject(globaldata);
+            HttpContext.Session.SetString("globaldata", jsondata);
+            ViewData["nickname"] = globaldata.ActualUser.NickName;
+            List <MensajesViewModel> mensajes = new List<MensajesViewModel>();
             HttpClient client = _api.Initial();
-            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{GlobalData.ActualUser.NickName}");
+            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{globaldata.ActualUser.NickName}");
             if (res.IsSuccessStatusCode)
             {
                 var results = res.Content.ReadAsStringAsync().Result;
                 mensajes = JsonConvert.DeserializeObject<List<MensajesViewModel>>(results);
 
             }
-            mensajes = mensajes.FindAll(x => ((x.Receptor == GlobalData.para && x.Emisor == GlobalData.ActualUser.NickName) || (x.Emisor == GlobalData.para && x.Receptor == GlobalData.ActualUser.NickName)));
+            mensajes = mensajes.FindAll(x => ((x.Receptor == globaldata.para && x.Emisor == globaldata.ActualUser.NickName) || (x.Emisor == globaldata.para && x.Receptor == globaldata.ActualUser.NickName)));
             mensajes = mensajes.OrderBy(x => x.Date).ToList();
-            int claveCifrado = dh.GenerarLlave(GlobalData.ActualUser.Code, GlobalData.Receptor.Code);
+            int claveCifrado = dh.GenerarLlave(globaldata.ActualUser.Code, globaldata.Receptor.Code);
             mensajes.ForEach(x => x.Cuerpo = sdes.MDesencriptar2(claveCifrado, x.Cuerpo));
 
 
@@ -71,16 +78,19 @@ namespace Projecto.Controllers
                 keys = JsonConvert.DeserializeObject<List<UserData>>(results); 
             }
 
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+            
             List<MensajesViewModel> mensajes = new List<MensajesViewModel>();
-            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{GlobalData.ActualUser.NickName}");
+            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{globaldata.ActualUser.NickName}");
             if (res.IsSuccessStatusCode)
             {
                 var results = res.Content.ReadAsStringAsync().Result;
                 mensajes = JsonConvert.DeserializeObject<List<MensajesViewModel>>(results);
 
             }
-            List<MensajesViewModel> MisMensajes = mensajes.FindAll(x => x.Emisor == GlobalData.ActualUser.NickName);
-            List<MensajesViewModel> MensajesRecibidos = mensajes.FindAll(x => x.Receptor == GlobalData.ActualUser.NickName);
+            List<MensajesViewModel> MisMensajes = mensajes.FindAll(x => x.Emisor == globaldata.ActualUser.NickName);
+            List<MensajesViewModel> MensajesRecibidos = mensajes.FindAll(x => x.Receptor == globaldata.ActualUser.NickName);
             Dictionary<string, int> llaves = new Dictionary<string, int>();
             foreach (var item in keys)
             {
@@ -91,7 +101,7 @@ namespace Projecto.Controllers
             {
                 MensajesViewModel ms = new MensajesViewModel();
                 ms = item;
-                int llave = dh.GenerarLlave(GlobalData.ActualUser.Code, llaves[item.Receptor]);
+                int llave = dh.GenerarLlave(globaldata.ActualUser.Code, llaves[item.Receptor]);
                 ms.Cuerpo = sdes.MDesencriptar2(llave, item.Cuerpo);
                 mios.Add(ms);
 
@@ -101,7 +111,7 @@ namespace Projecto.Controllers
             {
                 MensajesViewModel ms = new MensajesViewModel();
                 ms = item;
-                int llave = dh.GenerarLlave(llaves[item.Emisor], GlobalData.ActualUser.Code);
+                int llave = dh.GenerarLlave(llaves[item.Emisor], globaldata.ActualUser.Code);
                 ms.Cuerpo = sdes.MDesencriptar2(llave, item.Cuerpo);
                 recib.Add(ms);
             }
@@ -124,13 +134,16 @@ namespace Projecto.Controllers
             }
             MensajesViewModel mensajesNuevo = new MensajesViewModel();
 
-            int claveCifrado = dh.GenerarLlave(GlobalData.ActualUser.Code, GlobalData.Receptor.Code);
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            int claveCifrado = dh.GenerarLlave(globaldata.ActualUser.Code, globaldata.ActualUser.Code);
             texto = sdes.encriptarP2(claveCifrado, texto);
             mensajesNuevo.Cuerpo = texto;
             mensajesNuevo.Date = DateTime.Now.AddHours(-6);
             mensajesNuevo.Archivo = false;
-            mensajesNuevo.Emisor = GlobalData.ActualUser.NickName;
-            mensajesNuevo.Receptor = GlobalData.para;
+            mensajesNuevo.Emisor = globaldata.ActualUser.NickName;
+            mensajesNuevo.Receptor = globaldata.para;
             mensajesNuevo.Visible = "";
             HttpClient client = _api.Initial();
             var postTask = client.PostAsJsonAsync<MensajesViewModel>("api/Mensajes", mensajesNuevo);
@@ -138,7 +151,7 @@ namespace Projecto.Controllers
             var result = postTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.para);
+                return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
             }
             return RedirectToAction("Index", "Mensajes");
         }
@@ -207,12 +220,19 @@ namespace Projecto.Controllers
             HttpClient client = _api.Initial();
             HttpResponseMessage res = await client.DeleteAsync($"api/Mensajes/{id}");
 
-            return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.para);
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
         }
         public async Task<IActionResult> Borrar(string id)
         {
             HttpClient client = _api.Initial();
-            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{GlobalData.ActualUser.NickName}");
+
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{globaldata.ActualUser.NickName}");
             List<MensajesViewModel> mensajesViews = new List<MensajesViewModel>();
             MensajesViewModel mensajeAborrar = new MensajesViewModel();
             if (res.IsSuccessStatusCode)
@@ -220,16 +240,16 @@ namespace Projecto.Controllers
                 var results = res.Content.ReadAsStringAsync().Result;
                 mensajesViews = JsonConvert.DeserializeObject<List<MensajesViewModel>>(results); //Obtener de los datos del usuario ingresado
                 mensajeAborrar = mensajesViews.Find(x => x.Id == id);
-                mensajeAborrar.Visible = GlobalData.ActualUser.NickName;
+                mensajeAborrar.Visible = globaldata.ActualUser.NickName;
                 var postTask = client.PutAsJsonAsync<MensajesViewModel>($"api/Mensajes/{id}", mensajeAborrar);
                 postTask.Wait();
                 if (postTask.Result.IsSuccessStatusCode)
                 {
-                    return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.para);
+                    return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
                 }
             }
 
-            return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.para);
+            return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
         }
 
         // POST: Mensajes/Delete/5
@@ -252,6 +272,9 @@ namespace Projecto.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile Archivo)
         {
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
             if (Archivo == null || Archivo.Length == 0)
             {
                 return Content("Seleccione un archivo");
@@ -261,27 +284,30 @@ namespace Projecto.Controllers
             {
                 await Archivo.CopyToAsync(stream);
             }
-            GlobalData.ArchivoEntrada = path;
+            globaldata.ArchivoEntrada = path;
             LZWArchivos Compresor = new LZWArchivos();
             string RutaSalida = "";
             Compresor.ComprimirF(path, ref RutaSalida);
-            GlobalData.ArchivoSalida = RutaSalida;
+            globaldata.ArchivoSalida = RutaSalida;
             FileInfo fileInfo = new FileInfo(path);
             Queue<byte> Texto = new Queue<byte>();
-            LeerArchivo(ref Texto, GlobalData.ArchivoSalida);
+            LeerArchivo(ref Texto, RutaSalida);
             string salidaCompreso = "";
             while (Texto.Count > 0)
             {
                 salidaCompreso += Convert.ToString(Texto.Dequeue()) + ",";
             }
 
+            jsondata = JsonConvert.SerializeObject(globaldata);
+            HttpContext.Session.SetString("globaldata", jsondata);
+
             MensajesViewModel mensajesNuevo = new MensajesViewModel();
             mensajesNuevo.Cuerpo = salidaCompreso;
             mensajesNuevo.Date = DateTime.Now.AddHours(-6);
             mensajesNuevo.Archivo = true;
             mensajesNuevo.NombreArchivo = fileInfo.Name;
-            mensajesNuevo.Emisor = GlobalData.ActualUser.NickName;
-            mensajesNuevo.Receptor = GlobalData.para;
+            mensajesNuevo.Emisor = globaldata.ActualUser.NickName;
+            mensajesNuevo.Receptor = globaldata.para;
             mensajesNuevo.Visible = "";
             HttpClient client = _api.Initial();
             var postTask = client.PostAsJsonAsync<MensajesViewModel>("api/Mensajes", mensajesNuevo);
@@ -289,7 +315,7 @@ namespace Projecto.Controllers
             var result = postTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.para);
+                return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
             }
             return RedirectToAction("Index", "Mensajes");
 
@@ -321,6 +347,8 @@ namespace Projecto.Controllers
 
         public async Task<IActionResult> Descargar_archivo(string id)
         {
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
             HttpClient client = _api.Initial();
             _ = new MensajesViewModel();
             HttpResponseMessage res = await client.GetAsync($"api/Files/{id}");
@@ -337,17 +365,20 @@ namespace Projecto.Controllers
                 LZWArchivos lzw = new LZWArchivos();
                 string archivoNormalRuta = "";
                 lzw.MDescomprimir(path, ref archivoNormalRuta);
-                GlobalData.ArchivoSalida = archivoNormalRuta;
+                globaldata.ArchivoSalida = archivoNormalRuta;
                 return RedirectToAction("Download");
             }
-
-            return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.para);
+            jsondata = JsonConvert.SerializeObject(globaldata);
+            HttpContext.Session.SetString("globaldata", jsondata);
+            return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
 
         }
 
         public async Task<IActionResult> Download() 
         {
-            var path = GlobalData.ArchivoSalida;
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+            string path = globaldata.ArchivoSalida;
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
