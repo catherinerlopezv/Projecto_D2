@@ -7,8 +7,11 @@
     <link rel="stylesheet" href="~/lib/bootstrap5/css/bootstrap.min.css" />
     <link type="text/css" href="~/lib/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
     <link type="text/css" href="~/lib/vendor/notyf/notyf.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/volt.css" />
     <link rel="stylesheet" href="~/css/chat.css" />
+    <link rel="stylesheet" href="~/css/volt.css" />
+
+    <script src="~/lib/vue/vue.js"></script>
+
 </head>
 <body>
     <header class="header-global">
@@ -49,20 +52,7 @@
         </nav>
     </header>
     <main>
-        <section class="section section-lg bg-soft pt-0">
-            <div class="container">
-                <div class="row justify-content-between align-items-center mb-5 mb-lg-7">
-                    <div class="row justify-content-between align-items-center">
-                        <div class="col-lg-5 order-lg-2 mb-5 mb-lg-0">
-                            @RenderBody()
-                        </div>
-                        <div class="col-lg-6 order-lg-1">
-                            <img src="~/img/bs5-illustrations.svg" alt="Mis Contactos">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        @RenderBody()
     </main>
 
 
@@ -78,6 +68,7 @@
     <script src="~/lib/vendor/notyf/notyf.min.js"></script>
     <script src="~/lib/vendor/simplebar/dist/simplebar.min.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
 
     @RenderSection("Scripts", required: false)
 </body>
