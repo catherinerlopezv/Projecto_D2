@@ -61,6 +61,37 @@ namespace Projecto.Controllers
             return View(mensajes);
         }
 
+        [HttpGet]
+        public async Task<JsonResult> AllMyMessages([FromQuery]string id) {
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            UserData receptor = new UserData();
+
+            HttpClient client1 = _api.Initial();
+            HttpResponseMessage respuesta = await client1.GetAsync($"api/Login/{id}");
+            if (respuesta.IsSuccessStatusCode) {
+                var results = respuesta.Content.ReadAsStringAsync().Result;
+
+                receptor = JsonConvert.DeserializeObject<UserData>(results);
+            }
+
+            List<MensajesViewModel> mensajes = new List<MensajesViewModel>();
+            HttpClient client = _api.Initial();
+            HttpResponseMessage res = await client.GetAsync($"api/Mensajes/{globaldata.ActualUser.NickName}");
+            if (res.IsSuccessStatusCode) {
+                var results = res.Content.ReadAsStringAsync().Result;
+                mensajes = JsonConvert.DeserializeObject<List<MensajesViewModel>>(results);
+
+            }
+            mensajes = mensajes.FindAll(x => ((x.Receptor == id && x.Emisor == globaldata.ActualUser.NickName) || (x.Emisor == id && x.Receptor == globaldata.ActualUser.NickName)));
+            mensajes = mensajes.OrderBy(x => x.Date).ToList();
+            int claveCifrado = dh.GenerarLlave(globaldata.ActualUser.Code, receptor.Code);
+            mensajes.ForEach(x => x.Cuerpo = sdes.MDesencriptar2(claveCifrado, x.Cuerpo));
+            
+            return Json(mensajes);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Buscar(string mensaje)
@@ -154,6 +185,50 @@ namespace Projecto.Controllers
                 return Redirect("http://localhost:10999/Mensajes/Index/" + globaldata.para);
             }
             return RedirectToAction("Index", "Mensajes");
+        }
+
+        public class NMsg
+        {
+            public string para { get; set; }
+            public string texto { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> NuevoMensajeJson([FromBody]NMsg mensaje) {
+            if (mensaje.texto == null || mensaje.texto == "") {
+                return Json("Ingrese un mensaje");
+            }
+            MensajesViewModel mensajesNuevo = new MensajesViewModel();
+
+            string jsondata = HttpContext.Session.GetString("globaldata");
+            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
+
+            UserData receptor = new UserData();
+
+            HttpClient client1 = _api.Initial();
+            HttpResponseMessage respuesta = await client1.GetAsync($"api/Login/{mensaje.para}");
+            if (respuesta.IsSuccessStatusCode) {
+                var results = respuesta.Content.ReadAsStringAsync().Result;
+
+                receptor = JsonConvert.DeserializeObject<UserData>(results);
+            }
+
+            int claveCifrado = dh.GenerarLlave(globaldata.ActualUser.Code, receptor.Code);
+            mensaje.texto = sdes.encriptarP2(claveCifrado, mensaje.texto);
+            mensajesNuevo.Cuerpo = mensaje.texto;
+            mensajesNuevo.Date = DateTime.Now.AddHours(-6);
+            mensajesNuevo.Archivo = false;
+            mensajesNuevo.Emisor = globaldata.ActualUser.NickName;
+            mensajesNuevo.Receptor = mensaje.para;
+            mensajesNuevo.Visible = "";
+            HttpClient client = _api.Initial();
+            var postTask = client.PostAsJsonAsync<MensajesViewModel>("api/Mensajes", mensajesNuevo);
+            postTask.Wait();
+            var result = postTask.Result;
+            if (result.IsSuccessStatusCode) {
+                return Json("Enviado");
+            }
+            return Json("No se pudo enviar mensaje");
         }
         // GET: Mensajes/Details/5
         public ActionResult Details(int id)

@@ -28,8 +28,7 @@ namespace Api.Services
             _mensajes.Find<MensajesI>(x => x.NombreArchivo == name).FirstOrDefault();
 
         public List<MensajesI> Get(string nombre) => //Obtener los mensajes de cierta conversación
-            _mensajes.Find<MensajesI>(usuario => (usuario.Emisor == nombre || usuario.Receptor == nombre) && usuario.Visible != nombre).ToList();
-
+            _mensajes.Find(usuario => (usuario.Emisor == nombre || usuario.Receptor == nombre) && usuario.Visible != nombre).ToList();
         public List<MensajesI> BuscarMensaje(string text) =>
             _mensajes.Find(msg => msg.Cuerpo.Contains(text)).ToList();
 
