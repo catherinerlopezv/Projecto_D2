@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "e:\\Cathy\\Desktop\\Proyecto vs2\\Projecto_D2-master\\Archivos\\Archivos.csproj": {}
+    "e:\\Cathy\\Desktop\\git proyecto clonado\\Archivos\\Archivos.csproj": {}
   },
   "projects": {
-    "e:\\Cathy\\Desktop\\Proyecto vs2\\Projecto_D2-master\\Archivos\\Archivos.csproj": {
+    "e:\\Cathy\\Desktop\\git proyecto clonado\\Archivos\\Archivos.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Cathy\\Desktop\\Proyecto vs2\\Projecto_D2-master\\Archivos\\Archivos.csproj",
+        "projectUniqueName": "e:\\Cathy\\Desktop\\git proyecto clonado\\Archivos\\Archivos.csproj",
         "projectName": "Archivos",
-        "projectPath": "e:\\Cathy\\Desktop\\Proyecto vs2\\Projecto_D2-master\\Archivos\\Archivos.csproj",
+        "projectPath": "e:\\Cathy\\Desktop\\git proyecto clonado\\Archivos\\Archivos.csproj",
         "packagesPath": "C:\\Users\\Cathy\\.nuget\\packages\\",
-        "outputPath": "e:\\Cathy\\Desktop\\Proyecto vs2\\Projecto_D2-master\\Archivos\\obj\\",
+        "outputPath": "e:\\Cathy\\Desktop\\git proyecto clonado\\Archivos\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
