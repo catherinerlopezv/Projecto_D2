@@ -1,26 +1,54 @@
-﻿@model IEnumerable<Projecto.Models.MensajesViewModel>
+﻿@model Tuple<List<MensajesViewModel>, List<MensajesViewModelG>>
 
-@{
-    Layout = "_Layout";
-}
+@{ Layout = null; }
 
-<p>
-    <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
-</p>
+<!DOCTYPE html>
 
-@foreach (var item in Model) {
-        <ul>
-            <li>
-                Emisor:  <b>@Html.DisplayFor(modelItem => item.Emisor)</b>
-            </li>
-            <li>
-                Receptor: @Html.DisplayFor(modelItem => item.Receptor)
-            </li>
-            <li>
-                Mensaje: @Html.DisplayFor(modelItem => item.Cuerpo)
-            </li>
-            <li>
-                Hora: @Html.DisplayFor(modelItem => item.Date)
-            </li>
-        </ul>
-}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap">
+    <link rel="stylesheet" type="text/css" href="~/css/styleContactos.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    <title>Buscar</title>
+</head>
+<body>
+    <p>
+        <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
+    </p>
+
+    @foreach (var item in Model.Item1)
+    {
+<ul>
+    <li>
+        Emisor:  <b>@Html.DisplayFor(modelItem => item.Emisor)</b>
+    </li>
+    <li>
+        Receptor: @Html.DisplayFor(modelItem => item.Receptor)
+    </li>
+    <li>
+        Mensaje: @Html.DisplayFor(modelItem => item.Cuerpo)
+    </li>
+    <li>
+        Hora: @Html.DisplayFor(modelItem => item.Date)
+    </li>
+</ul>}
+    @foreach (var item in Model.Item2)
+    {
+<ul>
+    <li>
+        Emisor:  <b>@Html.DisplayFor(modelItem => item.Emisor)</b>
+    </li>
+    <li>
+        Receptor: @Html.DisplayFor(modelItem => item.Receptor)
+    </li>
+    <li>
+        Mensaje: @Html.DisplayFor(modelItem => item.Cuerpo)
+    </li>
+    <li>
+        Hora: @Html.DisplayFor(modelItem => item.Date)
+    </li>
+</ul>}
+</body>
+</html>

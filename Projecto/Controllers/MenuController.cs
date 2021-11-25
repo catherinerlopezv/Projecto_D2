@@ -11,12 +11,16 @@ using Projecto.Models;
 using Api.Models;
 using Projecto.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Projecto.Controllers
 {
     public class MenuController : Controller
     {
-        ChatAPI _api = new ChatAPI();
+        readonly ChatAPI _api = new ChatAPI();
+        private MyGlobalData GlobalData = new MyGlobalData();
+
         // GET: Menu
         public ActionResult Index()
         {
@@ -25,43 +29,24 @@ namespace Projecto.Controllers
 
         // GET: Menu/Create
         public static List<ContactosI> lista = new List<ContactosI>();
+        public static List<UsuarioI> lista3= new List<UsuarioI>();
+        public static List<UsuarioI> lista4 = new List<UsuarioI>();
         public async Task<IActionResult> MisContact()
         {
+            GlobalData.obtieneSesion(HttpContext.Session);
             lista.Clear();
             HttpClient client = _api.Initial();
-
-            string jsondata = HttpContext.Session.GetString("globaldata");
-            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
-
-            var res = await client.GetAsync($"api/Contactos/{globaldata.ActualUser.NickName}");
+            var res = await client.GetAsync($"api/Contactos/{GlobalData.ActualUser.NickName}");
             if (res.IsSuccessStatusCode)
             {
                 var resultas = res.Content.ReadAsStringAsync().Result;
-                var contactosUser = JsonConvert.DeserializeObject<ContactosI>(resultas); //Obtener de los datos del usuario ingresado
+                ContactosI contactosUser = JsonConvert.DeserializeObject<ContactosI>(resultas); //Obtener de los datos del usuario ingresado
                 lista.Add(contactosUser);
             }
-            return RedirectToAction("MisContactos", "Menu", lista);
+            return RedirectToAction("Ghost", "Grupos", lista);
         }
-
-        public async Task<JsonResult> MisContactJson() {
-            lista.Clear();
-            HttpClient client = _api.Initial();
-
-            string jsondata = HttpContext.Session.GetString("globaldata");
-            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
-
-            var res = await client.GetAsync($"api/Contactos/{globaldata.ActualUser.NickName}");
-            if (res.IsSuccessStatusCode) {
-                var resultas = res.Content.ReadAsStringAsync().Result;
-                var contactosUser = JsonConvert.DeserializeObject<ContactosI>(resultas); //Obtener de los datos del usuario ingresado
-                lista.Add(contactosUser);
-            }
-            // var result = JsonConvert.SerializeObject(lista);
-            return new JsonResult(lista);
-        }
-
         [HttpGet]
-        public ActionResult MisContactos(List<ContactosI> collection)
+        public ActionResult MisContactos()
         {
             try
             {
@@ -80,28 +65,223 @@ namespace Projecto.Controllers
             return View();
         }
 
-        public ActionResult AddContacto()
+        public async Task<ActionResult> AddContactoAsync()
         {
-            return View();
+             GlobalData.obtieneSesion(HttpContext.Session);
+            HttpClient client = _api.Initial();
+            var res = await client.GetAsync($"api/Login/");
+            if (res.IsSuccessStatusCode)
+            {
+                var resultas = res.Content.ReadAsStringAsync().Result;
+                List<UsuarioI> contactosUser = JsonConvert.DeserializeObject<List<UsuarioI>>(resultas); //Obtener de los datos del usuario ingresado
+                var contactos = contactosUser;
+
+                for (int i = 0; i < contactosUser.Count; i++)
+                {
+                    if (contactosUser[i].Requests != null )
+                    {
+                        if (contactosUser[i].Requests.Count != 0)
+                        {
+                            for (int j = 0; j < contactosUser[i].Requests.Count; j++)
+                            {
+
+                                for (int k = 0; k < lista.Count; k++)
+                                {
+                                    for (int l = 0; l < lista[k].ContactosAmigos.Count; l++)
+                                    {
+                                        contactosUser = contactosUser.FindAll(x => x.NickName != lista[k].ContactosAmigos[l]);
+                                        if (contactosUser.Count == 0)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (contactosUser.Count == 0)
+                                    {
+                                        break;
+                                    }
+                                }
+                                if (contactosUser.Count == 0)
+                                {
+                                    break;
+                                }
+                                contactosUser = contactosUser.FindAll(x => x.NickName != GlobalData.ActualUser.NickName);
+                                if (contactosUser.Count<=i)
+                                {
+                                    break;
+                                }
+                                if (contactosUser[i].Requests==null)
+                                {
+                                    break;
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+            A:
+                for (int i = 0; i < contactosUser.Count; i++)
+                {
+
+                    if (contactosUser[i].Requests != null)
+                    {
+                        for (int j = 0; j < contactosUser[i].Requests.Count; j++)
+                        {
+                            if (contactosUser[i].Requests[j] == GlobalData.ActualUser.NickName || contactosUser[i].NickName == GlobalData.ActualUser.NickName)
+                            {
+                                contactosUser.RemoveAt(i);
+                                goto A;
+                            }
+
+
+                            if (contactosUser.Count == 0)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (contactosUser[i].NickName == GlobalData.ActualUser.NickName)
+                        {
+                            contactosUser.RemoveAt(i);
+                            goto A;
+                        }
+                    }
+                }
+            B:
+                for (int i = 0; i < contactosUser.Count; i++)
+                {
+                    if (lista != null&&lista.Count!=0)
+                    {
+
+
+                        for (int j = 0; j < lista[0].ContactosAmigos.Count; j++)
+                        {
+                            if (contactosUser[i].NickName == lista[0].ContactosAmigos[j])
+                            {
+                                contactosUser = contactosUser.FindAll(x => x.NickName != lista[0].ContactosAmigos[j]);
+                                goto B;
+                            }
+                            if (contactosUser[i].NickName==GlobalData.ActualUser.NickName)
+                            {
+                                contactosUser = contactosUser.FindAll(x => x.NickName != GlobalData.ActualUser.NickName);
+                                goto B;
+                            }
+                        }
+                    }
+                }
+
+
+
+                
+                contactos = contactos.FindAll(x => x.NickName == GlobalData.ActualUser.NickName);
+                if (contactos.Count!=0)
+                {
+                    if (contactos[0].Requests == null)
+                    {
+                        contactos[0].Requests = new List<string>();
+
+                    }
+                    for (int i = 0; i < contactos[0].Requests.Count; i++)
+                    {
+                        var temp=contactosUser.FindAll(x => x.NickName == contactos[0].Requests[i]);
+                        if (temp != null)
+                        {
+                            contactosUser= contactosUser.FindAll(x => x.NickName != contactos[0].Requests[i]);
+                        }
+
+                    }
+                }
+               
+               
+                lista3 = contactosUser;
+                lista4 = contactos;
+                if (lista3.SequenceEqual(lista4))
+                {
+                    lista3 = new List<UsuarioI>();
+                    lista4 = new List<UsuarioI>();
+                }
+            }
+
+
+            var tupleModel = new Tuple<List<UsuarioI>, List<UsuarioI>>(lista3, lista4);
+
+
+            ViewData["NickName"] = GlobalData.ActualUser.NickName;
+            return View(tupleModel);
+
         }
 
+        public async Task<IActionResult> GrupoAsync(List<string> integrantes, string usuarioLogueado)
+        {
+
+
+            for (int i = 0; i < integrantes.Count; i++)
+            {
+                HttpClient client2 = _api.Initial();
+                var res2 = await client2.GetAsync($"api/SignIn/GetT/{integrantes[i]},{usuarioLogueado},{i.ToString()}");
+            }
+
+
+            return RedirectToAction("Index", "Menu");
+        }
+        public async Task<IActionResult> AceptarAsync(List<string> integrantes, string usuarioLogueado, string Aceptar)
+        {
+            if (Aceptar == "Aceptar")
+            {
+                for (int i = 0; i < integrantes.Count; i++)
+                {
+                    await AddConta(integrantes[i], usuarioLogueado);
+                    await AddConta(usuarioLogueado, integrantes[i]);
+                }
+                for (int i = 0; i < integrantes.Count; i++)
+                {
+                    HttpClient client2 = _api.Initial();
+                    var res2 = await client2.GetAsync($"api/SignIn/GetT/{"borrar"},{usuarioLogueado},{integrantes[i]}");
+                    var res3 = await client2.GetAsync($"api/SignIn/GetT/{"borrar"},{integrantes[i]},{usuarioLogueado}");
+                }
+            }
+            else if (Aceptar=="Cancelar")
+            {
+                for (int i = 0; i < integrantes.Count; i++)
+                {
+                    HttpClient client2 = _api.Initial();
+                    var res2 = await client2.GetAsync($"api/SignIn/GetT/{"borrar"},{usuarioLogueado},{integrantes[i]}");
+                    var res3 = await client2.GetAsync($"api/SignIn/GetT/{"borrar"},{integrantes[i]},{usuarioLogueado}");
+                }
+            }
+
+
+
+            return RedirectToAction("Index", "Menu");
+        }
+        private MongoClient Conexion()
+        {
+            var cliente = new MongoClient("mongodb+srv://uwu:321@death.rfwpy.mongodb.net/admin?authSource=admin&replicaSet=atlas-wwl3nk-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true");
+            return cliente;
+        }
+
+
+       
+
+
+
+
+
         [HttpPost]
-        public async Task<IActionResult> AddConta(string contact)
+        public async Task<IActionResult> AddConta(string contact,string actual)
         {
             HttpClient client = _api.Initial();
             if (contact != "" && contact != null)
             {
                 HttpResponseMessage res = await client.GetAsync($"api/Login/{contact}");
-
-                string jsondata = HttpContext.Session.GetString("globaldata");
-                GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
-
-                UserData user = new UserData();
+                _ = new UserData();
                 if (res.IsSuccessStatusCode)
                 {
                     var results = res.Content.ReadAsStringAsync().Result;
-                    user = JsonConvert.DeserializeObject<UserData>(results); //Obtener de los datos del usuario ingresado
-                    res = await client.GetAsync($"api/Contactos/{globaldata.ActualUser.NickName}");
+                    UserData user = JsonConvert.DeserializeObject<UserData>(results);
+                    res = await client.GetAsync($"api/Contactos/{actual}");
                     if (res.IsSuccessStatusCode)
                     {
                         var resultas = res.Content.ReadAsStringAsync().Result;
@@ -109,7 +289,7 @@ namespace Projecto.Controllers
                         if (!(contactosUser.ContactosAmigos.Contains(user.NickName)))
                         {
                             contactosUser.ContactosAmigos.Add(user.NickName);
-                            var postTask = client.PutAsJsonAsync<ContactosI>($"api/Contactos/{globaldata.ActualUser.NickName}", contactosUser);
+                            var postTask = client.PutAsJsonAsync<ContactosI>($"api/Contactos/{actual}", contactosUser);
                             postTask.Wait();
                             if (postTask.Result.IsSuccessStatusCode)
                             {
@@ -120,9 +300,11 @@ namespace Projecto.Controllers
                     }
                     else
                     {
-                        ContactosI nuevoContacto = new ContactosI();
-                        nuevoContacto.OwnerNickName = globaldata.ActualUser.NickName;
-                        nuevoContacto.ContactosAmigos = new List<string>();
+                        ContactosI nuevoContacto = new ContactosI
+                        {
+                            OwnerNickName = actual,
+                            ContactosAmigos = new List<string>()
+                        };
                         nuevoContacto.ContactosAmigos.Add(user.NickName);
 
                         var postTask = client.PostAsJsonAsync<ContactosI>("api/Contactos", nuevoContacto);
@@ -143,54 +325,43 @@ namespace Projecto.Controllers
 
         public async Task<IActionResult> Edit()
         {
+           GlobalData.obtieneSesion(HttpContext.Session);
             HttpClient client = _api.Initial();
-
-            string jsondata = HttpContext.Session.GetString("globaldata");
-            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
-
-
-            HttpResponseMessage res = await client.GetAsync($"api/Login/{globaldata.ActualUser.NickName}");
-            UserData user = new UserData();
+            HttpResponseMessage res = await client.GetAsync($"api/Login/{GlobalData.ActualUser.NickName}");
+            _ = new UserData();
             if (res.IsSuccessStatusCode)
             {
                 var results = res.Content.ReadAsStringAsync().Result;
-                user = JsonConvert.DeserializeObject<UserData>(results); 
+                UserData user = JsonConvert.DeserializeObject<UserData>(results);
                 return View(user);
             }
-            ViewData["nickname"] = globaldata.ActualUser.NickName;
+            ViewData["NickName"] = GlobalData.ActualUser.NickName;
             return View();
         }
 
         public async Task<IActionResult> Borrar(string id)
         {
-            var mensaje = new MensajesViewModel();
+           GlobalData.obtieneSesion(HttpContext.Session);
+            _ = new MensajesViewModel();
             HttpClient client = _api.Initial();
-            HttpResponseMessage res = await client.DeleteAsync($"api/SignIn/{id}");
+            _ = await client.DeleteAsync($"api/SignIn/{id}");
 
-            string jsondata = HttpContext.Session.GetString("globaldata");
-            GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
-
-            return Redirect("http://localhost:10999/Login" + globaldata.para);
+            return Redirect("http://localhost:10999/Login" + GlobalData.ParaGrupos);
         }
 
         [HttpPost]
         public ActionResult Edit(UserData userData)
         {
+             GlobalData.obtieneSesion(HttpContext.Session);
             try
             {
-                string jsondata = HttpContext.Session.GetString("globaldata");
-                GlobalData globaldata = JsonConvert.DeserializeObject<GlobalData>(jsondata);
-
                 if (userData.Name != null && userData.Name != "" && userData.Password != null && userData.Password != "")
                 {
-                    globaldata.ActualUser.Name = userData.Name;
-                    globaldata.ActualUser.Password = userData.Password;
-
-                    jsondata = JsonConvert.SerializeObject(globaldata);
-                    HttpContext.Session.SetString("globaldata", jsondata);
-
+                    GlobalData.ActualUser.Name = userData.Name;
+                    GlobalData.ActualUser.Password = userData.Password;
+                    GlobalData.actualizaSesion(HttpContext.Session);
                     HttpClient client = _api.Initial();
-                    var res = client.PutAsJsonAsync($"api/SignIn/", globaldata.ActualUser);
+                    var res = client.PutAsJsonAsync($"api/SignIn/", GlobalData.ActualUser);
                     res.Wait();
                     if (res.Result.IsSuccessStatusCode)
                     {

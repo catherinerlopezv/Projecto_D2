@@ -12,7 +12,8 @@ namespace Projecto.Helper
         {
             var client = new HttpClient
             {
-               BaseAddress = new Uri("https://localhost:44336/")
+                // BaseAddress = new Uri("http://localhost:24733/")
+                BaseAddress = new Uri("https://localhost:44336/")
             };
             return client;
         }

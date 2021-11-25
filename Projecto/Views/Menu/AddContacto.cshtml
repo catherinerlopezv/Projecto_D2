@@ -1,18 +1,83 @@
 ﻿
 @{
-    Layout = "_Layout";
+    Layout = null;
 }
+@using Api.Models;
+@model Tuple<List<UsuarioI>, List<UsuarioI>>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap">
+    <link rel="stylesheet" type="text/css" href="~/css/styleContactos.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <p>
+        <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
+    </p>
+    @using (Html.BeginForm("Grupo", "Menu", FormMethod.Post))
+    {
+
+        <input type="text" value='@ViewData["NickName"]' name="usuarioLogueado" hidden />
+
+        <div class="form-group">
+            <label for="exampleFormControlSelect1">Example select</label>
+            <select class='mi-selector' id="colores" name='integrantes[]' multiple="multiple" style="width:100%;">
+                @foreach (var item in Model.Item1)
+                {
+
+                    <option value='@item.NickName'>@item.NickName</option>
+                }
 
 
-    <div class="newsletter">
-        <h1>
-            Añadir
-            <span>Contactos</span>
-        </h1>
-    </div>
-    <form asp-controller="Menu" asp-action="AddConta" method="post">
-        <div class="search-box">
-            <input type="text" name="contact" class="form-control" placeholder="Usuario a buscar" />
-            <button type="submit" class="btn btn-gray-800 d-inline-flex align-items-center me-2">Buscar</button>
+
+            </select>
         </div>
-    </form>
+        <button class="btn btn-primary" type="submit">Solicitud</button>
+
+    }
+
+    @using (Html.BeginForm("Aceptar", "Menu", FormMethod.Post))
+    {
+
+        <div class="form-group">
+            <label for="exampleFormControlSelect1">Example select</label>
+            @foreach (var item in Model.Item2)
+            {
+                <input type="text" value="@item.NickName" name="usuarioLogueado" hidden />
+            }
+            <select class='mi-selector' id="colores" name='integrantes[]' multiple="multiple" style="width:100%;">
+                @foreach (var item in Model.Item2)
+                {
+                    @foreach (var amigo in item.Requests)
+                    {
+
+                        <option value='@amigo'>@amigo</option>
+
+                    }
+
+
+                }
+            </select>
+
+        </div>
+
+        <button class="btn btn-primary" type="submit" value="Aceptar" name="Aceptar">Aceptar</button>
+
+        <button class="btn btn-primary" type="submit" value="Cancelar" name="Aceptar">Cancelar</button>
+    }
+
+
+    <script>
+        jQuery(document).ready(function ($) {
+            $(document).ready(function () {
+                $('.mi-selector').select2();
+            });
+        });
+
+
+    </script>
+</body>
+</html>

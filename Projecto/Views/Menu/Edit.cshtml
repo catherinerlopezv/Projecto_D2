@@ -2,12 +2,11 @@
 
 @{
     ViewData["Title"] = "Edit";
-
 }
 
 <h1>Editar mi información</h1>
 
-<h4>@ViewData["nickname"]</h4>
+<h4>@ViewData["NickName"]</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -30,7 +29,7 @@
     </div>
 </div>
 <div>
-    @Html.ActionLink("Eliminar Cuenta", "Borrar", new { id = @ViewData["nickname"] })
+    @Html.ActionLink("Eliminar Cuenta", "Borrar", new { id = ViewData["NickName"] })
 </div>
 
 <div>

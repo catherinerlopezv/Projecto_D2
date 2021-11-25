@@ -1,0 +1,55 @@
+﻿
+@{ 
+    Layout = null;
+}
+@model IEnumerable<Api.Models.ContactosI>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap">
+    <link rel="stylesheet" type="text/css" href="~/css/styleContactos.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <p>
+        <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
+    </p>
+     @using (Html.BeginForm("Grupo", "Grupos", FormMethod.Post))
+     {
+          <input type="text" value='@ViewData["NickName"]' name="usuarioLogueado" hidden />
+    <div class="form-group">
+        <label for="nombreGrupo">Nombre del grupo</label>
+        <input type="text" class="form-control" id="nombreGrupo"  name="nombreGrupo">
+
+    </div>
+    
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">Example select</label>
+        <select class='mi-selector' id="colores" name='integrantes[]' multiple="multiple" style="width:100%;">
+            @foreach (var item in Model)
+            {
+@foreach (var amigo in item.ContactosAmigos)
+{
+<option value='@amigo'>@amigo</option>}
+            }
+
+            }
+        </select>
+    </div>
+    <button class="btn btn-primary" type="submit">Crear</button>
+     }
+
+
+    <script>
+    jQuery(document).ready(function ($) {
+        $(document).ready(function () {
+            $('.mi-selector').select2();
+        });
+    });
+
+
+</script>
+</body>
+</html>

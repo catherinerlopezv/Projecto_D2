@@ -41,8 +41,10 @@ namespace Projecto
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseStaticFiles();
             app.UseSession();
+            
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthorization();

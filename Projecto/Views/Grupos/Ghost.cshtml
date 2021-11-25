@@ -1,0 +1,69 @@
+﻿@model Tuple<IEnumerable<ContactosI>, IEnumerable<Grupos>>
+@{ Layout = null; }
+@using Api.Models;
+
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap">
+    <link rel="stylesheet" type="text/css" href="~/css/styleContactos.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+
+
+
+  
+    <ul>
+        @foreach (ContactosI teacher in Model.Item1.ToList())
+        {
+            @foreach (string amigo in teacher.ContactosAmigos)
+            {
+                <li>
+                    <span class="number"><i class="fa fa-circle-o" aria-hidden="true"></i></span>
+                    <span class="name">@amigo</span>
+                    <span class="points">@Html.ActionLink("Mensaje", "Index", "Mensajes", new { id = amigo })  <i class="fa fa-comment-o" aria-hidden="true"></i></span>
+                </li>
+            }
+
+        }
+        @foreach (var student in Model.Item2)
+        {
+
+            
+                <li>
+                    <span class="number"><i class="fa fa-circle-o" aria-hidden="true"></i></span>
+                    <span class="name">@student.Grupo</span>
+                    <span class="points">@Html.ActionLink("Mensaje", "IndexMensajes", "Mensajes", new { id = student.Grupo })  <i class="fa fa-comment-o" aria-hidden="true"></i></span>
+                </li>
+                @foreach (string amigo in student.Amigos)
+                {
+                    <li>
+                        <span class="number"><i class="fa fa-circle-o" aria-hidden="true"></i></span>
+                        <span class="name">@amigo</span>
+
+                    </li>
+                }
+
+
+            }
+        
+
+
+
+
+        <li>
+            <span class="number"><i class="fa fa-star" aria-hidden="true"></i></span>
+            <span class="name">Añadir nuevo contacto</span>
+            <span class="points"><a href="@Url.Action("AddContacto", "Menu")"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></span>
+
+
+        </li>
+
+
+    </ul>
+</body>
+</html>

@@ -6,22 +6,39 @@ namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MensajesController : ControllerBase
+    public class MensajesGrupoController : ControllerBase
     {
-        private readonly MensajesService _mensajesService;
-        public MensajesController(MensajesService mensajeService)
+        private readonly MensajesGrupoService _mensajesService;
+        public MensajesGrupoController(MensajesGrupoService mensajeService)
         {
             _mensajesService = mensajeService;
         }
         [HttpGet]
-        public ActionResult<List<MensajesI>> Get()
-        {
-            return _mensajesService.Get();
-        }
+        public ActionResult<List<MensajesI>> Get() =>
+           _mensajesService.Get();
+
+
 
         [HttpGet("{nombre}")] //Obtener todos los mensajes de cierto usuario
-        public ActionResult<List<MensajesI>> Get(string nombre,int i) =>
-            _mensajesService.Get(nombre, i);
+        public ActionResult<List<MensajesI>> Get(string nombre, int i)
+        {
+            var a= _mensajesService.Get(nombre, i);
+            var b = _mensajesService.GetG(nombre, i);
+
+            if (a!=null)
+            {
+                if (a.Count!=0)
+                {
+                    return a;
+                }
+
+            }
+            if (b != null)
+            {
+                return b ;
+            }
+            return NotFound();
+        }
 
         [HttpPost]
         public ActionResult<MensajesI> Create(MensajesI msg) //Crear un mensaje
@@ -62,10 +79,10 @@ namespace Api.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class BuscarMController : ControllerBase
+    public class BuscarMGController : ControllerBase
     {
-        private readonly MensajesService _mensajesService;
-        public BuscarMController(MensajesService mensajeService)
+        private readonly MensajesGrupoService _mensajesService;
+        public BuscarMGController(MensajesGrupoService mensajeService)
         {
             _mensajesService = mensajeService;
         }

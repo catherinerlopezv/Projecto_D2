@@ -52,5 +52,36 @@ namespace Api.Controllers
 
         }
 
+        [HttpGet("GetT/{nombre},{solicitud},{posicionCauseNoImporta}")]
+        public ActionResult<Grupos> Get2(string nombre,string solicitud,string posicionCauseNoImporta)
+        {
+            if (nombre == "borrar")
+            {
+                var oldData = _loginService.Get(solicitud);
+                if (oldData.Requests!=null)
+                {
+                    oldData.Requests.Remove(posicionCauseNoImporta);
+                    _loginService.Update(solicitud, oldData);
+                }
+                
+            }
+            var NewData = _loginService.Get(nombre);
+            if (NewData == null)
+            {
+                return NotFound();
+            }
+            if(NewData.Requests==null)
+            {
+                NewData.Requests = new List<string>();
+            }
+            NewData.Requests.Insert(0, solicitud);
+            
+                _loginService.Update(nombre, NewData);
+              
+           
+            return NoContent();
+
+        }
+
     }
 }

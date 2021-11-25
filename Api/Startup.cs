@@ -28,6 +28,8 @@ namespace Api
             services.AddSingleton<UserService>();
             services.AddSingleton<ContactosService>();
             services.AddSingleton<MensajesService>();
+            services.AddSingleton<GruposService>();
+            services.AddSingleton<MensajesGrupoService>();
             services.AddControllers();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
