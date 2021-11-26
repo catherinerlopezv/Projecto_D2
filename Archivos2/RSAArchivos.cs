@@ -4,7 +4,7 @@ using System.IO;
 using System.Numerics;
 using System.Text;
 
-namespace Archivos
+namespace Archivos2
 {
 
     public class Cifrado

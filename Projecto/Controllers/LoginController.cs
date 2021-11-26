@@ -10,7 +10,7 @@ using Projecto.Helper;
 using Projecto.Models;
 using Projecto.Utilities;
 using Newtonsoft.Json;
-using Archivos;
+using Archivos2;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;

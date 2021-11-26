@@ -9,11 +9,6 @@
   font-family: 'Josefin Sans', sans-serif;
 }
 
-body{
-  background: url(bg.jpg) no-repeat;
-  background-size: cover;
-}
-
 .wrapper{
   max-width: 350px;
   width: 100%;

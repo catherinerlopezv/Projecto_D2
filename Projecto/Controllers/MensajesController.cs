@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Projecto.Helper;
 using Projecto.Models;
 using Projecto.Utilities;
-using Archivos;
+using Archivos2;
 using System.IO;
 using Api.Models;
 
@@ -520,7 +520,7 @@ namespace Projecto.Controllers
                 return View();
             }
         }
-
+        //envio de archivo chat simple
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile Archivo,int i)
         {
@@ -570,7 +570,7 @@ namespace Projecto.Controllers
             return RedirectToAction("Index", "Mensajes");
 
         }
-
+        //envio de archivo chat grupal
         [HttpPost]
         public async Task<IActionResult> UploadFileG(IFormFile Archivo, string i)
         {
@@ -647,13 +647,13 @@ namespace Projecto.Controllers
 
 
         }
-
+        //descarga archivo individual
         public async Task<IActionResult> Descargar_archivo(string id, int i)
         {
              GlobalData.obtieneSesion(HttpContext.Session);
             HttpClient client = _api.Initial();
             _ = new MensajesViewModel();
-            HttpResponseMessage res = await client.GetAsync($"api/Files/{id}");
+            HttpResponseMessage res = await client.GetAsync($"api/Archivos/{id}");
             Queue<byte> textoEntrada = new Queue<byte>();
             if (res.IsSuccessStatusCode)
             {
@@ -668,19 +668,20 @@ namespace Projecto.Controllers
                 string archivoNormalRuta = "";
                 lzw.MDescomprimir(path, ref archivoNormalRuta);
                 GlobalData.ArchivoSalida = archivoNormalRuta;
+                GlobalData.actualizaSesion(HttpContext.Session);
                 return RedirectToAction("Download");
             }
 
             return Redirect("http://localhost:10999/Mensajes/Index/" + GlobalData.ParaGrupos[i]);
 
         }
-
+        //descarga de archivo grupal
         public async Task<IActionResult> Descargar_archivoG(string id, int i)
         {
            GlobalData.obtieneSesion(HttpContext.Session);
             HttpClient client = _api.Initial();
             _ = new MensajesViewModel();
-            HttpResponseMessage res = await client.GetAsync($"api/Files/{id}");
+            HttpResponseMessage res = await client.GetAsync($"api/ArchivosGrupo/{id}");
             Queue<byte> textoEntrada = new Queue<byte>();
             if (res.IsSuccessStatusCode)
             {
@@ -695,10 +696,11 @@ namespace Projecto.Controllers
                 string archivoNormalRuta = "";
                 lzw.MDescomprimir(path, ref archivoNormalRuta);
                 GlobalData.ArchivoSalida = archivoNormalRuta;
+                GlobalData.actualizaSesion(HttpContext.Session);
                 return RedirectToAction("Download");
             }
 
-            return Redirect("http://localhost:10999/Mensajes/IndexMensajes/" + GlobalData.ParaGrupos[i]);
+            return RedirectToAction("IndexMensajes", GlobalData.ParaGrupos[i], i);
 
         }
 

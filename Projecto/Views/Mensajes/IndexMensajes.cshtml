@@ -16,13 +16,11 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
     <title>Mensajes</title>
 </head>
-<body>
+<body style='background-image: url(@Url.Content("~/img/liso2.jpg")); background-repeat: no-repeat; background-size: cover;'>
     <p>
-        <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
+        <a asp-action="Index" asp-controller="Menu" class="text-black">Regresar al menú</a>
     </p>
-    <p>
-        <a href="http://localhost:61798/Menu/MisContactos?Capacity=4&Count=1">Regresar a los mensajes</a>
-    </p>
+
     @{
         string ruta = "";
         for (int i = 0; i < ParaGrupos.Count; i++)
@@ -31,68 +29,74 @@
         }
 
     }
-    <a href=@ruta>Recargar</a>
+    
     @foreach (var item in Model.Item1)
-    { @foreach (var cosa in item)
-{
-        <ul>
-            <li>
-                <b>@Html.DisplayFor(modelItem => cosa.Emisor)</b>
-            </li>
-            @if (cosa.Archivo == false)
-            {
+    {@foreach (var cosa in item)
+        {
+            <ul>
                 <li>
-                    @Html.DisplayFor(modelItem => cosa.Cuerpo)
-                    
+                    <b>@Html.DisplayFor(modelItem => cosa.Emisor)</b>
                 </li>
-            }
-            @if (cosa.Archivo == true)
-            {
+                @if (cosa.Archivo == false)
+                {
+                    <li>
+                        @Html.DisplayFor(modelItem => cosa.Cuerpo)
+
+                    </li>
+                }
+                @if (cosa.Archivo == true)
+                {
+                    <li>
+                        @Html.DisplayFor(modelItem => cosa.NombreArchivo)
+                    </li>
+                }
+
                 <li>
-                    @Html.DisplayFor(modelItem => cosa.NombreArchivo)
+                    @Html.DisplayFor(modelItem => cosa.Date)
                 </li>
-            }
-
-            <li>
-                @Html.DisplayFor(modelItem => cosa.Date)
-            </li>
 
 
-            @if (cosa.Emisor == (string)ViewData["NickName"])
-            {
-                @Html.ActionLink("Borrar para todos", "BorrarGLobalG", new { id = cosa.Id, i= cosa.Grupo })
-            }
-            @Html.ActionLink("Borrar para mi", "BorrarG", new { id = cosa.Id, i = cosa.Grupo })
-            @if (cosa.Archivo == true)
-            {
-                @Html.ActionLink("Descargar", "Descargar_archivoG", new { id = cosa.NombreArchivo, i = cosa.Grupo })
-            }
-            
-        </ul>
+                @if (cosa.Emisor == (string)ViewData["NickName"])
+                {
+                    @Html.ActionLink("Borrar para todos", "BorrarGLobalG", new { id = cosa.Id, i = cosa.Grupo })
+                }
+                @Html.ActionLink("Borrar para mi", "BorrarG", new { id = cosa.Id, i = cosa.Grupo })
+                @if (cosa.Archivo == true)
+                {
+                    @Html.ActionLink("Descargar", "Descargar_archivoG", new { id = cosa.NombreArchivo, i = cosa.Grupo })
+                }
+
+            </ul>
+        }
 }
-    }
     <form asp-controller="Mensajes" asp-action="NuevoMensajeGrupo" method="post">
         <center>
-            <input type="text" width="800" name="texto" />
-            @{string valor= Model.Item2; }
-            <input value= @valor width="800" name="i" hidden />
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            <input  class="form-control" type="text" width="800" name="texto" />
+            @{string valor = Model.Item2; }
+            <input  class="form-control" value=@valor width="800" name="i" hidden />
+            <button class="btn btn-gray-800" type="submit"><i class="fas fa-paper-plane"></i></button>
         </center>
 
     </form>
     <form asp-controller="Mensajes" asp-action="UploadFileG" method="post" enctype="multipart/form-data">
         <div>
-          
-            <h5>Archivo: 
-            <input type="file" name="Archivo" />
-               @{string valor2= Model.Item2; }
-            <input value= @valor2 width="800" name="i" hidden />
+
+            <h5>
+                Archivo:
+                <input  class="form-control" type="file" name="Archivo" />
+                @{string valor2 = Model.Item2; }
+                <input  class="form-control" value=@valor2 width="800" name="i" hidden />
             </h5>
-            <center><button type="submit">Enviar archivo</button></center>
+            <center><button class="btn btn-gray-800" type="submit">Enviar archivo</button></center>
 
 
         </div>
     </form>
+    <script>
+        setTimeout(function () {
+            window.location.reload(1);
+        }, 10000);
 
+    </script>
 </body>
 </html>

@@ -14,13 +14,11 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
     <title>Mensajes</title>
 </head>
-<body>
+<body style='background-image: url(@Url.Content("~/img/liso2.jpg")); background-repeat: no-repeat; background-size: cover;'>
     <p>
-        <a asp-action="Index" asp-controller="Menu">Regresar al menú</a>
+        <a asp-action="Index" asp-controller="Menu" class="text-black">Regresar al menú</a>
     </p>
-    <p>
-        <a href="http://localhost:61798/Menu/MisContactos?Capacity=4&Count=1">Regresar a los mensajes</a>
-    </p>
+
 
     @foreach (var item in Model.Item1)
     {
@@ -60,9 +58,9 @@
     }
     <form asp-controller="Mensajes" asp-action="NuevoMensaje" method="post">
         <center>
-            <input type="text" width="800" name="texto" />
-            <input value=Model.item2 width="800" name="i" hidden />
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            <input  class="form-control" type="text" width="800" name="texto" />
+            <input  class="form-control" value=Model.item2 width="800" name="i" hidden />
+            <button class="btn btn-gray-800" type="submit"><i class="fas fa-paper-plane"></i></button>
         </center>
 
     </form>
@@ -70,11 +68,16 @@
         <div>
 
             <h5>Archivo: <input type="file" name="Archivo" /></h5>
-            <input value=Model.item2 width="800" name="i" hidden />
-            <center><button type="submit">Enviar archivo</button></center>
+            <input  class="form-control" value=Model.item2 width="800" name="i" hidden />
+            <center><button class="btn btn-gray-800" type="submit">Enviar archivo</button></center>
 
         </div>
     </form>
+    <script>
+        setTimeout(function () {
+            window.location.reload(1);
+        }, 10000);
 
+    </script>
 </body>
 </html>
