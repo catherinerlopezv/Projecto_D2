@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gabri\\Source\\Repos\\Projecto_D2\\Archivos\\Archivos.csproj": {}
+    "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Archivos\\Archivos.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gabri\\Source\\Repos\\Projecto_D2\\Archivos\\Archivos.csproj": {
+    "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Archivos\\Archivos.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gabri\\Source\\Repos\\Projecto_D2\\Archivos\\Archivos.csproj",
+        "projectUniqueName": "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Archivos\\Archivos.csproj",
         "projectName": "Archivos",
-        "projectPath": "C:\\Users\\gabri\\Source\\Repos\\Projecto_D2\\Archivos\\Archivos.csproj",
+        "projectPath": "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Archivos\\Archivos.csproj",
         "packagesPath": "C:\\Users\\gabri\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gabri\\Source\\Repos\\Projecto_D2\\Archivos\\obj\\",
+        "outputPath": "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Archivos\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\Programas\\VS Shared\\NuGetPackages"
