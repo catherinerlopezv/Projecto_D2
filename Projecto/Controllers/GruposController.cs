@@ -126,10 +126,14 @@ namespace Projecto.Controllers
             var _collection = database.GetCollection<BsonDocument>("Grupos");
             var filter = Builders<BsonDocument>.Filter.Eq("Grupo", nombreDelGrupo);
             var result = _collection.Find(filter).ToList();
+            nombreDelGrupo = nombreDelGrupo.Replace(" ", "");
+            nombreDelGrupo = nombreDelGrupo.Replace("   ", "");
             if (result.Count!=0)
             {
                 nombreDelGrupo = nombreDelGrupo + (result.Count + 1);
+               
             }
+          
             var document = new BsonDocument
             {
                 { "Grupo", nombreDelGrupo },
@@ -147,7 +151,14 @@ namespace Projecto.Controllers
 
         public bool ActualizarIntegrantesGrupo(List<string> integrantes, string usuarioCreador, string nombreGrupo)
         {
+          
             var database = Conexion().GetDatabase("Death");
+     
+
+            nombreGrupo = nombreGrupo.Replace(" ", "");
+            nombreGrupo = nombreGrupo.Replace("   ", "");
+
+      
             var coleccion = database.GetCollection<Grupos>("Grupos");
             var filtro = Builders<Grupos>.Filter.Eq("Usuario", usuarioCreador) & Builders<Grupos>.Filter.Eq("Grupo", nombreGrupo);
             var update = Builders<Grupos>.Update.Set("Amigos", integrantes);

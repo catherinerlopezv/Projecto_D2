@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "e:\\Cathy\\Desktop\\git proyecto clonado\\Api\\Api.csproj": {}
+    "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Api\\Api.csproj": {}
   },
   "projects": {
-    "e:\\Cathy\\Desktop\\git proyecto clonado\\Api\\Api.csproj": {
+    "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Api\\Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Cathy\\Desktop\\git proyecto clonado\\Api\\Api.csproj",
+        "projectUniqueName": "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Api\\Api.csproj",
         "projectName": "Api",
-        "projectPath": "e:\\Cathy\\Desktop\\git proyecto clonado\\Api\\Api.csproj",
-        "packagesPath": "C:\\Users\\Cathy\\.nuget\\packages\\",
-        "outputPath": "e:\\Cathy\\Desktop\\git proyecto clonado\\Api\\obj\\",
+        "projectPath": "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Api\\Api.csproj",
+        "packagesPath": "C:\\Users\\gabri\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\gabri\\source\\repos\\Projecto_D2\\Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "D:\\Programas\\VS Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Cathy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "D:\\AppData\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -71,12 +71,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[3.1.21, 3.1.21]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
